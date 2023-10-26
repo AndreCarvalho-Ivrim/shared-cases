@@ -1,0 +1,2 @@
+export type NotificationToTypes = 'broadcast_hub' | 'broadcast' | 'broadcast_flow_auth' | 'hub_perms' | 'flow_perms' | 'hub_ids' | 'flow_auth_ids';
+export type NotificationTypes = 'update' | 'mention' | 'alert' | 'reminder' | 'license';
