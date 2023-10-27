@@ -28,7 +28,7 @@ interface DTONotification {
   templates?: {
     template_id: string;
     type: string;
-    data: string;
+    data: any;
   }[],
   schedule: Date
 }
