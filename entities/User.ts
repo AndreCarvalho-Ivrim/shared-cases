@@ -3,7 +3,7 @@ import { Client } from "./Client";
 import { UserCategory } from "./UserCategory";
 
 export class User {    
-  public readonly id: string;
+  public readonly id: string = uuid_v4();
   public email: string;
   public password: string;
   public picture: string;
@@ -18,6 +18,6 @@ export class User {
 
   constructor(props: Omit<User, 'id'>, id?: string){
     Object.assign(this, props);
-    if(!id) this.id = uuid_v4();
+    if(id) this.id = id;
   }
 }

@@ -610,7 +610,7 @@ export class CreateNotificationUseCase {
     try{
       await this.authenticatedCommunication.sendNotifications(notificationIdsForIsac);
     } catch (error) {
-      throw new Error(error.message ?? 'Não foi possível disparar a(s) notificação(ões)');
+      throw new Error(error.message ?? 'Não foi possível disparar as notificações');
     }
 
     return notificationIdsForIsac;

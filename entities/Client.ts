@@ -19,7 +19,7 @@ export const clientFields : Record<keyof Omit<Client, 'id' | 'deadlines'>, true>
 }
 
 export class Client {
-  public readonly id: string
+  public readonly id: string = uuid_v4();
   public cnpj: string
   public razao_social: string
   public nome_fantasia: string
@@ -38,6 +38,6 @@ export class Client {
 
   constructor(props: Omit<Client, 'id'>, id?: string) {
     Object.assign(this, props);
-    if(!id) this.id = uuid_v4();
+    if(id) this.id = id
   }
 }
