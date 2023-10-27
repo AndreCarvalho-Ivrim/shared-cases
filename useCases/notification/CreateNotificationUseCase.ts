@@ -59,7 +59,7 @@ export class CreateNotificationUseCase {
         sms?: string,
         whatsapp?: string,
       },
-      notification_group_id: string,
+      notification_group_id?: string,
       notifyBy?: NotifyByType,
       is_archived?: boolean
     }> = [];
@@ -167,7 +167,7 @@ export class CreateNotificationUseCase {
         )
         const usersInId = await this.userRepo.findUsersInId(data.data);
 
-        let notiGroupHubIdsId;
+        let notiGroupHubIdsId : string | undefined = undefined;
 
         if (usersInId.length > 1) {
           const notiGroupHubIds = await this.notificationGroupRepo.create({
@@ -175,7 +175,8 @@ export class CreateNotificationUseCase {
             data: data.data.join(','),
             client_id: data.ignore_client_id ? undefined : data.client_id,
             owner_id: data.user_id,
-            is_hub: data.is_hub
+            is_hub: data.is_hub,
+            flow_id: data.flow_id // --opcional, usado apenas para fins de pesquisa
           });
 
           notiGroupHubIdsId = notiGroupHubIds.id
@@ -191,7 +192,7 @@ export class CreateNotificationUseCase {
               sms: user.whatsapp,
               whatsapp: user.whatsapp
             },
-            notification_group_id: notiGroupHubIdsId || null
+            notification_group_id: notiGroupHubIdsId
           });
         });
         break;
@@ -297,14 +298,20 @@ export class CreateNotificationUseCase {
         }) : []
 
         if (userFlowAuth.length === 0) throw new Error("Nenhum usuário a ser notificado.");
-        const notificationFlowAuth = await this.notificationGroupRepo.create({
-          type: data.to,
-          data: data.data.join(','),
-          owner_id: data.user_id,
-          is_hub: data.is_hub,
-          client_id: data.client_id,
-          flow_id: data.flow_id
-        });
+        let notificationFlowAuthId : string | undefined = undefined
+        
+        if(data.data.length > 1){
+          const notificationFlowAuth = await this.notificationGroupRepo.create({
+            type: data.to,
+            data: data.data.join(','),
+            owner_id: data.user_id,
+            is_hub: data.is_hub,
+            client_id: data.client_id,
+            flow_id: data.flow_id
+          });
+
+          notificationFlowAuthId = notificationFlowAuth.id
+        }
 
         userFlowAuth.map(async (user) => {
           usersIds.push(user.id);
@@ -316,7 +323,7 @@ export class CreateNotificationUseCase {
               sms: user.sms ?? user.whatsapp,
               whatsapp: user.whatsapp
             },
-            notification_group_id: notificationFlowAuth.id!,
+            notification_group_id: notificationFlowAuthId,
             notifyBy: user.notifyBy,
             is_archived: user.is_archived
           });
@@ -391,6 +398,86 @@ export class CreateNotificationUseCase {
           });
         });
         break;
+      
+      case 'anonymous':
+        if(!data.data || !Array.isArray(data.data) || !data.data.every((i) => typeof i === 'string')) throw new Error(
+          'Selecione os contatos que deseja notificar'
+        ) 
+
+        const userAnonymous : {
+          id: string,
+          email?: string,
+          sms?: string,
+          whatsapp?: string,
+          notifyBy?: NotifyByType,
+          is_archived?: boolean
+        }[] = data.data.map((item) => {
+          let resAnonymous : any = {
+            id: item,
+            notifyBy: { type: data.type, plataform: false },
+            is_archived: false,
+          }
+
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          const splited = item.split(',')
+          splited.forEach((itemSplited) => {
+            if(emailRegex.test(itemSplited)){
+              resAnonymous['email'] = itemSplited
+              resAnonymous['notifyBy'] = {
+                ...(resAnonymous['notifyBy'] ?? {}),
+                email: true,
+              }
+            }
+            else{
+              const unMasked = itemSplited.replace(/\D/g, "")
+              if(unMasked.length >= 10 && unMasked.length <= 15){
+                resAnonymous['sms'] = itemSplited
+                resAnonymous['whatsapp'] = itemSplited
+                resAnonymous['notifyBy'] = {
+                  ...(resAnonymous['notifyBy'] ?? {}),
+                  whatsapp: true,
+                  // sms: true --não implementado
+                }
+              }
+            }
+          })
+
+          return resAnonymous;
+        })
+
+        if (userAnonymous.length === 0) throw new Error("Nenhum usuário a ser notificado.");
+        let notificationAnonymousId : string | undefined = undefined;
+        if(data.data.length > 1){
+          const notificationAnonymous = await this.notificationGroupRepo.create({
+            type: data.to,
+            data: data.data.join(','),
+            owner_id: data.user_id,
+            is_hub: data.is_hub,
+            client_id: data.client_id,
+            flow_id: data.flow_id
+          });
+
+          notificationAnonymousId = notificationAnonymous.id
+        }
+
+        userFlowAuth.map(async (user) => {
+          usersIds.push(user.id);
+
+          notificationUsers.push({
+            user: {
+              id: user.id,
+              email: user.email,
+              sms: user.sms ?? user.whatsapp,
+              whatsapp: user.whatsapp
+            },
+            notification_group_id: notificationAnonymousId,
+            notifyBy: user.notifyBy,
+            is_archived: user.is_archived
+          });
+        });
+        break;
+
       default: throw new Error(
         'Destino de notificação inválido'
       )
@@ -403,7 +490,7 @@ export class CreateNotificationUseCase {
       return await this.notificationPreferenceRepo.findByUserId(usersIds) ?? [];
     })()
     
-    let templates : any;
+    let templates : { template_ids: string, template_datas: string } | undefined = undefined;
 
     if (data.templates && data.templates.length > 0 || Array.isArray(data.templates)) {
       const template_id_data = data.templates.map(template => {
@@ -433,7 +520,7 @@ export class CreateNotificationUseCase {
         } = { type: data.type };
 
         let is_archived = false
-        if(['broadcast_flow_auth','flow_auth_ids'].includes(data.to)){
+        if(['broadcast_flow_auth','flow_auth_ids','anonymous'].includes(data.to)){
           if(notificationUser.notifyBy){
             if(notificationUser.notifyBy.plataform) originalPreference.plataform = 'hub';
             ['email', 'sms', 'whatsapp'].forEach((prop) => {
@@ -505,9 +592,7 @@ export class CreateNotificationUseCase {
           }:{}),
           is_archived,
           schedule: data.schedule,
-          flow_id: ['broadcast_flow_auth','flow_auth_ids','flow_perms'].includes(
-            data.to
-          ) ? data.flow_id : undefined
+          flow_id: data.flow_id
         });
 
         if(!data.schedule){
