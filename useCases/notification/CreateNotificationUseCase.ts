@@ -1,4 +1,5 @@
 import {
+  NotificationTemplateType,
   NotificationToTypes,
   NotificationTypes,
   SimpleAuthenticatedCommunication,
@@ -25,11 +26,7 @@ interface DTONotification {
   is_hub?: boolean;
   ignore_client_id?: boolean;
   data?: string[]
-  templates?: {
-    template_id: string;
-    type: string;
-    data: any;
-  }[],
+  templates?: NotificationTemplateType[],
   schedule: Date
 }
 interface NotifyByType{
@@ -493,7 +490,7 @@ export class CreateNotificationUseCase {
     let templates : { template_ids: string, template_datas: string } | undefined = undefined;
 
     if (data.templates && data.templates.length > 0 || Array.isArray(data.templates)) {
-      const template_id_data = data.templates.map(template => {
+      const template_datas = data.templates.map(template => {
         return {
           template_id: template.template_id,
           type: template.type,
@@ -502,8 +499,8 @@ export class CreateNotificationUseCase {
       });
 
       templates = {
-        template_ids: template_id_data.map(id => id.template_id).join(','),
-        template_datas: JSON.stringify(template_id_data),
+        template_ids: template_datas.map(id => id.template_id).join(','),
+        template_datas: JSON.stringify(template_datas),
       }
     }
 
@@ -607,10 +604,12 @@ export class CreateNotificationUseCase {
       })
     )
 
-    try{
-      await this.authenticatedCommunication.sendNotifications(notificationIdsForIsac);
-    } catch (error) {
-      throw new Error(error.message ?? 'Não foi possível disparar as notificações');
+    if(notificationIdsForIsac.length > 0){
+      try{
+        await this.authenticatedCommunication.sendNotifications(notificationIdsForIsac);
+      } catch (error) {
+        throw new Error(error.message ?? 'Não foi possível disparar as notificações');
+      }
     }
 
     return notificationIdsForIsac;
