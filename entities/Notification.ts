@@ -23,6 +23,10 @@ export class Notification {
   public is_sended?: boolean
   public priority?: number
   public owner_id?: string
+  public external_id?: string
+  public created_at?: Date
+  public updated_at?: Date
+
   public is_hub?: boolean
 
   constructor(props: Omit<Notification, "id">, id?: string) {
@@ -30,5 +34,8 @@ export class Notification {
 
     if(!id) this.id = uuid_v4();
     else this.id = id;
+
+    if(!props.created_at) this.created_at = new Date()
+    if(!props.updated_at) this.updated_at = new Date()
   }
 }

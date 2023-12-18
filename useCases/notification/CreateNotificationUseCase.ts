@@ -24,6 +24,7 @@ interface DTONotification {
   flow_id?: string;
   priority?: number;
   is_hub?: boolean;
+  external_id?: string;
   ignore_client_id?: boolean;
   data?: string[]
   templates?: NotificationTemplateType[],
@@ -73,6 +74,7 @@ export class CreateNotificationUseCase {
           owner_id: data.user_id,
           is_hub: data.is_hub,
           client_id: data.ignore_client_id ? undefined : data.client_id,
+
         });
 
         allUsers.map(async (user) => {
@@ -586,6 +588,7 @@ export class CreateNotificationUseCase {
           icon: data.icon,
           client_id: !data.client_id || data.ignore_client_id ? undefined : data.client_id,
           priority: data.priority,
+          external_id: data.external_id,
           redirect_to: data.redirect_to,
           ...(templates ? {
             template_datas: templates.template_datas,
