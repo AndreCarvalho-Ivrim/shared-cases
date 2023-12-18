@@ -458,7 +458,7 @@ export class CreateNotificationUseCase {
           notificationAnonymousId = notificationAnonymous.id
         }
 
-        userFlowAuth.map(async (user) => {
+        userAnonymous.map(async (user) => {
           usersIds.push(user.id);
 
           notificationUsers.push({
