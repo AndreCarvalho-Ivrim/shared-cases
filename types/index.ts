@@ -13,6 +13,8 @@ export interface SimpleUserRepository{
 }
 export interface SimpleNotificationRepository{
   create(data: Notification): Promise<Notification>;
+  deleteId(id: string) : Promise<void>;
+  deleteExternalId(external_id: string) : Promise<void>;
 }
 export interface SimpleNotificationGroupRepository{
   create(data: NotificationGroup): Promise<NotificationGroup>;
