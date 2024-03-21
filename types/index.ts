@@ -32,10 +32,14 @@ export interface SimpleUserCategoriesOnUsersRepository{
 export interface SimpleNotificationPreferenceRepository{
   findByUserId(user_ids: string[]): Promise<NotificationPreference[]>;
 }
+export interface ResponseGetTenantIdAndOwnerIdByFlowId extends ResultAndResponse{
+  data?: { tenant_id: string, owner_id: string }
+}
 export interface SimpleAuthenticatedCommunication{
   sendNotifications(notification_ids: string[]): Promise<void>;
   getUsersWithFlowPermission(flow_id: string, flow_perms: string[]): Promise<ResponseUsers>;
   getFlowAuthsWithPreference(flow_id: string, user_ids?: string[], all?: boolean): Promise<ResponseUsers>;
+  getTenantIdAndOwnerIdByFlowId(flow_id: string) : Promise<ResponseGetTenantIdAndOwnerIdByFlowId>
 }
 export interface SimpleNotificationCacheMemoryRepository{
   clearCache(user_id: string, client_id: string, flow_id?: string) : void
