@@ -16,6 +16,7 @@ export const clientFields : Record<keyof Omit<Client, 'id' | 'deadlines'>, true>
   ddd: true,
   telefone: true,
   email: true,
+  economic_group: true
 }
 
 export class Client {
@@ -31,7 +32,7 @@ export class Client {
   public bairro: string
   public cidade: string
   public estado: string
-
+  public economic_group? : string
   public ddd: string
   public telefone: string
   public email: string
