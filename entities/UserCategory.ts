@@ -7,10 +7,13 @@ export class UserCategory{
   public name: string
   public description?: string  
   public clientId : string
+  public depth? : number
   public permitions?: Permition[]
 
   constructor(props: Omit<UserCategory,"id">, id?: string){
     Object.assign(this,props);
+    
+    if(this.depth == undefined) this.depth = 0;
     
     if(id) this.id = id
   }
