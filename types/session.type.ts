@@ -1,5 +1,7 @@
 import { Session, SessionType } from "../entities/Session";
 
+export type PreDefinedApiFeedbacks = 'Invalid JWT token' | 'There is already another session'
+
 export interface ISessionRepository {
   create(data: Omit<Session, "id" | "updated_at">): Promise<Session>,
   findAllSessionByUserId(user_id: string): Promise<Array<Session>>,
