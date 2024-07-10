@@ -34,6 +34,8 @@ export class Session {
     } else {
       this.id = id;
     };
+    if(!this.last_access) this.last_access = new Date();
+    if(typeof this.active !== 'boolean') this.active = ['1',1,'true'].includes(this.active) ? true : false
 
     this.ip = Session.parseIp(this.ip)
   }
