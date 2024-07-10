@@ -1,4 +1,5 @@
 import moment from "moment";
+import * as momentTz from "moment-timezone";
 
 import { ISessionRepository } from "../types/session.type";
 import { Session } from "../entities/Session";
@@ -16,6 +17,7 @@ export interface ShortSession{
 export class SingletonSessionRepository{
   private static instance: SingletonSessionRepository;
   private loggedSessions: Record<string, Session>;
+  private now = momentTz.tz('America/Sao_Paulo').add(3, 'hours').toDate();
   private sessionExpireMinutes: number = 3; 
 
   private constructor(
@@ -71,7 +73,8 @@ export class SingletonSessionRepository{
       const updatedSession = await this.sessionRepo.update(
         currentSession.id, 
         { 
-          last_access: new Date(),
+          last_access: this.now,
+          updated_at: this.now,
           device: currentSession.device 
         }
       )
@@ -81,13 +84,12 @@ export class SingletonSessionRepository{
   }
 
   public async initiateSession(session: ShortSession){
-    const now = new Date();
     const createdSession: Session = await this.sessionRepo.create({
       ...session,
-      session_start_date: now,
-      last_access: now,
+      session_start_date: this.now,
+      last_access: this.now,
       active: true,
-      created_at: now,
+      created_at: this.now,
     });
     
     this.loggedSessions[session.user_id] = createdSession;
@@ -99,9 +101,8 @@ export class SingletonSessionRepository{
   }
 }
 
-
 export const differenceMinutes = (hour: Date): number => {
-  const now = moment();
+  const now = momentTz.tz('America/Sao_Paulo').add(3, "hours");
   const normalizedHour = moment(hour, "YYYY-MM-DD hh:mm:ss");
-  return now.diff(normalizedHour, "minutes");  
+  return now.diff(normalizedHour, "minutes");
 }
