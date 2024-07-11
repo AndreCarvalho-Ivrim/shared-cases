@@ -1,6 +1,7 @@
 import { v4 as uuid_v4 } from "uuid";
 import UAParser from "ua-parser-js";
 import axios from "axios";
+import * as momentTz from "moment-timezone";
 
 export interface SessionType extends Omit<Session, 'id'>{
   id?: string
@@ -34,8 +35,8 @@ export class Session {
     } else {
       this.id = id;
     };
-    if(!this.last_access) this.last_access = new Date();
-    if(!this.updated_at) this.updated_at = new Date();
+    if(!this.last_access) this.last_access = momentTz.tz('America/Sao_Paulo').toDate();
+    if(!this.updated_at) this.updated_at = momentTz.tz('America/Sao_Paulo').toDate();
     if(typeof this.active !== 'boolean') this.active = ['1',1,'true'].includes(this.active) ? true : false
 
     this.ip = Session.parseIp(this.ip)

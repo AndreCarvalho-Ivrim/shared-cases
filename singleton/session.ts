@@ -17,7 +17,7 @@ export interface ShortSession{
 export class SingletonSessionRepository{
   private static instance: SingletonSessionRepository;
   private loggedSessions: Record<string, Session>;
-  private now = momentTz.tz('America/Sao_Paulo').add(3, 'hours').toDate();
+  private now = momentTz.tz('America/Sao_Paulo').toDate();
   private sessionExpireMinutes: number = 3; 
 
   private constructor(
@@ -102,7 +102,7 @@ export class SingletonSessionRepository{
 }
 
 export const differenceMinutes = (hour: Date): number => {
-  const now = momentTz.tz('America/Sao_Paulo').add(3, "hours");
+  const now = momentTz.tz('America/Sao_Paulo');
   const normalizedHour = moment(hour, "YYYY-MM-DD hh:mm:ss");
   return now.diff(normalizedHour, "minutes");
 }
