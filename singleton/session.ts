@@ -1,7 +1,6 @@
-import moment from "moment";
 import "moment-timezone";
 
-import { ISessionRepository } from "../types/session.type";
+import { ISessionRepository, ISessionSingletonRepository } from "../types/session.type";
 import { Session } from "../entities/Session";
 import { PreDefinedApiFeedbacks } from "../types/session.type";
 import { convertDate, differenceMinutes } from "../utils/date";
@@ -15,7 +14,7 @@ export interface ShortSession{
   country?: string,
 }
 
-export class SingletonSessionRepository{
+export class SingletonSessionRepository implements ISessionSingletonRepository {
   private static instance: SingletonSessionRepository;
   private loggedSessions: Record<string, Session>;
   private now = convertDate(new Date());

@@ -1,4 +1,5 @@
 import { Session, SessionType } from "../entities/Session";
+import { ShortSession } from "../singleton/session";
 
 export type PreDefinedApiFeedbacks = 'Invalid JWT token' | 'There is already another session'
 
@@ -13,7 +14,8 @@ export interface ISessionRepository {
 }
 
 export interface ISessionSingletonRepository {
-  create(): void,
-  find(): void,
-  remove(): void,
+  checkActiveSession(currentSession: ShortSession): Promise<Session>,
+  handleLastAccessOfSession(currentSession: ShortSession): Promise<void>,
+  initiateSession(session: ShortSession): Promise<void>,
+  disableSession(session: Session): Promise<void>,
 }
