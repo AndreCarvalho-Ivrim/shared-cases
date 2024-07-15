@@ -65,6 +65,12 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     return startedSession;
   }
 
+  public updateSession(userId: string): boolean {
+    if(!this.loggedSessions[userId]) return;
+    delete this.loggedSessions[userId];
+    return true;
+  }
+
   public async handleLastAccessOfSession(
     currentSession: Session,
   ){
