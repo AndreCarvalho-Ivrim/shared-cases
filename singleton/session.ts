@@ -19,6 +19,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   private loggedSessions: Record<string, Session>;
   private now = convertDate(new Date());
   private sessionExpireMinutes: number = 3; 
+  private sessionExpireMinutesByLastAccess: number = 60; 
 
   private constructor(
     private sessionRepo: ISessionRepository
@@ -65,7 +66,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     return startedSession;
   }
 
-  public updateSession(userId: string): boolean {
+  public updateCacheSession(userId: string): boolean {
     if(!this.loggedSessions[userId]) return;
     delete this.loggedSessions[userId];
     return true;
@@ -75,7 +76,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     currentSession: Session,
   ){
     const difference = differenceMinutes(currentSession.last_access);
-    if(difference >= this.sessionExpireMinutes){
+    if(difference >= this.sessionExpireMinutesByLastAccess) {
       const updatedSession = await this.sessionRepo.update(
         currentSession.id, 
         { 

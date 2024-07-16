@@ -15,7 +15,7 @@ export interface ISessionRepository {
 
 export interface ISessionSingletonRepository {
   checkActiveSession(currentSession: ShortSession): Promise<Session>,
-  updateSession(userId: string): boolean,
+  updateCacheSession(userId: string): boolean,
   handleLastAccessOfSession(currentSession: ShortSession): Promise<void>,
   initiateSession(session: ShortSession): Promise<void>,
   disableSession(session: Session): Promise<void>,
