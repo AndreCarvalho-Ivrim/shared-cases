@@ -78,10 +78,10 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     return startedSession;
   }
 
-  public updateCacheSession(userId: string): boolean {
-    if(!this.loggedSessions[userId]) return;
-    delete this.loggedSessions[userId];
-    return true;
+  public updateCacheSession(userId: string): void {
+    if(this.loggedSessions[userId]) {
+      delete this.loggedSessions[userId];
+    };
   }
 
   public async handleLastAccessOfSession(
@@ -99,7 +99,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
       )
       
       this.loggedSessions[currentSession.user_id] = updatedSession;
-      await this.api.sendUpdateCacheSession(updatedSession.user_id);
+      setTimeout(async () => await this.api.sendUpdateCacheSession(updatedSession.user_id), 200); 
     }
   }
 
