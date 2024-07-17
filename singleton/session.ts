@@ -4,6 +4,7 @@ import { ISessionRepository, ISessionSingletonRepository } from "../types/sessio
 import { Session } from "../entities/Session";
 import { PreDefinedApiFeedbacks } from "../types/session.type";
 import { convertDate, differenceMinutes } from "../utils/date";
+import { AxiosResponse } from "axios";
 
 export interface ShortSession{
   user_id: string,
@@ -19,26 +20,38 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   private loggedSessions: Record<string, Session>;
   private now = convertDate(new Date());
   private sessionExpireMinutes: number = 3; 
-  private sessionExpireMinutesByLastAccess: number = 60; 
+  private sessionExpireMinutesByLastAccess: number = 1; 
 
   private constructor(
-    private sessionRepo: ISessionRepository
+    private sessionRepo: ISessionRepository,
+    private api: (userId: string) => Promise<AxiosResponse>
   ) {
     this.loggedSessions = { };
   }
 
-  public static getInstance(sessionRepo: ISessionRepository): SingletonSessionRepository {
+  public static getInstance(
+    sessionRepo: ISessionRepository,
+    api: (userId: string) => Promise<AxiosResponse>
+  ): SingletonSessionRepository {
     if (!SingletonSessionRepository.instance) {
-      SingletonSessionRepository.instance = new SingletonSessionRepository(sessionRepo);
+      SingletonSessionRepository.instance = new SingletonSessionRepository(sessionRepo, api);
     }
     return SingletonSessionRepository.instance;
   }
 
   public async checkActiveSession(currentSession: ShortSession): Promise<Session> {    
     let startedSession: Session | undefined = this.loggedSessions[currentSession.user_id]
+    const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
 
+    if (
+      startedSession &&
+      existsSession &&
+      startedSession.updated_at !== existsSession.updated_at
+    ) {
+      this.loggedSessions[currentSession.user_id] = existsSession;
+      startedSession = existsSession;
+    }
     if (!startedSession) {
-      const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
       if(!existsSession) return;
 
       this.loggedSessions[currentSession.user_id] = existsSession;
@@ -87,6 +100,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
       )
       
       this.loggedSessions[currentSession.user_id] = updatedSession;
+      await this.api(updatedSession.user_id);
     }
   }
 
