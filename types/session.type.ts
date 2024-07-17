@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { Session, SessionType } from "../entities/Session";
 import { ShortSession } from "../singleton/session";
 
@@ -19,4 +20,8 @@ export interface ISessionSingletonRepository {
   handleLastAccessOfSession(currentSession: ShortSession): Promise<void>,
   initiateSession(session: ShortSession): Promise<void>,
   disableSession(session: Session): Promise<void>,
+}
+
+export interface ISessionApi {
+  sendUpdateCacheSession(userId: string): Promise<AxiosResponse>,
 }

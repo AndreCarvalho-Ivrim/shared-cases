@@ -1,10 +1,9 @@
 import "moment-timezone";
 
-import { ISessionRepository, ISessionSingletonRepository } from "../types/session.type";
+import { ISessionApi, ISessionRepository, ISessionSingletonRepository } from "../types/session.type";
 import { Session } from "../entities/Session";
 import { PreDefinedApiFeedbacks } from "../types/session.type";
 import { convertDate, differenceMinutes } from "../utils/date";
-import { AxiosResponse } from "axios";
 
 export interface ShortSession{
   user_id: string,
@@ -20,18 +19,18 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   private loggedSessions: Record<string, Session>;
   private now = convertDate(new Date());
   private sessionExpireMinutes: number = 3; 
-  private sessionExpireMinutesByLastAccess: number = 1; 
+  private sessionExpireMinutesByLastAccess: number = 60; 
 
   private constructor(
     private sessionRepo: ISessionRepository,
-    private api: (userId: string) => Promise<AxiosResponse>
+    private api: ISessionApi
   ) {
     this.loggedSessions = { };
   }
 
   public static getInstance(
     sessionRepo: ISessionRepository,
-    api: (userId: string) => Promise<AxiosResponse>
+    api: ISessionApi
   ): SingletonSessionRepository {
     if (!SingletonSessionRepository.instance) {
       SingletonSessionRepository.instance = new SingletonSessionRepository(sessionRepo, api);
@@ -100,7 +99,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
       )
       
       this.loggedSessions[currentSession.user_id] = updatedSession;
-      await this.api(updatedSession.user_id);
+      await this.api.sendUpdateCacheSession(updatedSession.user_id);
     }
   }
 
