@@ -19,7 +19,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   private loggedSessions: Record<string, Session>;
   private now = convertDate(new Date());
   private sessionExpireMinutes: number = 3; 
-  private sessionExpireMinutesByLastAccess: number = 60; 
+  private sessionExpireMinutesByLastAccess: number = 3; 
 
   private constructor(
     private sessionRepo: ISessionRepository,
