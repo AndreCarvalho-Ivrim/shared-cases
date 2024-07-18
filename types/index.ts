@@ -41,7 +41,8 @@ export interface SimpleAuthenticatedCommunication{
   sendNotifications(notification_ids: string[]): Promise<void>;
   getUsersWithFlowPermission(flow_id: string, flow_perms: string[]): Promise<ResponseUsers>;
   getFlowAuthsWithPreference(flow_id: string, user_ids?: string[], all?: boolean): Promise<ResponseUsers>;
-  getTenantIdAndOwnerIdByFlowId(flow_id: string) : Promise<ResponseGetTenantIdAndOwnerIdByFlowId>
+  getTenantIdAndOwnerIdByFlowId(flow_id: string) : Promise<ResponseGetTenantIdAndOwnerIdByFlowId>;
+  sendUpdateCacheSession(userId: string, session_id: string): Promise<ResultAndResponse>;
 }
 export interface SimpleNotificationCacheMemoryRepository{
   clearCache(user_id: string, client_id: string, flow_id?: string) : void

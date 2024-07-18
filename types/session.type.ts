@@ -16,12 +16,8 @@ export interface ISessionRepository {
 
 export interface ISessionSingletonRepository {
   checkActiveSession(currentSession: ShortSession): Promise<Session>,
-  updateCacheSession(userId: string): void,
+  deleteCacheSession(userId: string, sessionId?: string): void,
   handleLastAccessOfSession(currentSession: ShortSession): Promise<void>,
   initiateSession(session: ShortSession): Promise<void>,
   disableSession(session: Session): Promise<void>,
-}
-
-export interface ISessionApi {
-  sendUpdateCacheSession(userId: string, timeOut: boolean): Promise<AxiosResponse>,
 }
