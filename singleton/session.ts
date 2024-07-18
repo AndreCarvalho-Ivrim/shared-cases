@@ -45,6 +45,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
     
     if (!startedSession) {
+      const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
       if(!existsSession) return;
 
       this.loggedSessions[currentSession.user_id] = existsSession;
