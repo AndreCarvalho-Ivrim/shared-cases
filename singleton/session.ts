@@ -17,11 +17,12 @@ export interface ShortSession{
 export class SingletonSessionRepository implements ISessionSingletonRepository {
   private static instance: SingletonSessionRepository;
   private loggedSessions: Record<string, Session>;
-  private now = convertDate(new Date());
+  private now = convertDate(this.application, new Date());
   private sessionExpireMinutes: number = 3; 
   private sessionExpireMinutesByLastAccess: number = 3; 
 
   private constructor(
+    private application: string,
     private sessionRepo: ISessionRepository,
     private api: ISessionApi
   ) {
@@ -29,11 +30,12 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   }
 
   public static getInstance(
+    application: string,
     sessionRepo: ISessionRepository,
     api: ISessionApi
   ): SingletonSessionRepository {
     if (!SingletonSessionRepository.instance) {
-      SingletonSessionRepository.instance = new SingletonSessionRepository(sessionRepo, api);
+      SingletonSessionRepository.instance = new SingletonSessionRepository(application, sessionRepo, api);
     }
     return SingletonSessionRepository.instance;
   }
@@ -67,7 +69,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
       continue;
     }
     if(changedState || startedSession.ip !== currentSession.ip){
-      const expiredSession = differenceMinutes(startedSession.last_access) <= (Number(this.sessionExpireMinutes) * 3);
+      const expiredSession = differenceMinutes(this.application, startedSession.last_access) <= (Number(this.sessionExpireMinutes) * 3);
       if(changedState) startedSession = { ...startedSession, ...currentSession };
       if(expiredSession) throw new Error("There is already another session" as PreDefinedApiFeedbacks);
       else {
@@ -87,19 +89,21 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   public async handleLastAccessOfSession(
     currentSession: Session,
   ){
-    const difference = differenceMinutes(currentSession.last_access);
+    const difference = differenceMinutes(this.application, currentSession.last_access);
     if(difference >= this.sessionExpireMinutesByLastAccess) {
-      const updatedSession = await this.sessionRepo.update(
-        currentSession.id, 
-        { 
-          last_access: this.now,
-          updated_at: this.now,
-          device: currentSession.device 
-        }
-      )
-      
-      this.loggedSessions[currentSession.user_id] = updatedSession;
-      await this.api.sendUpdateCacheSession(updatedSession.user_id, true); 
+      if(this.loggedSessions[currentSession.user_id].updated_at !== this.now) {
+        const updatedSession = await this.sessionRepo.update(
+          currentSession.id, 
+          { 
+            last_access: this.now,
+            updated_at: this.now,
+            device: currentSession.device 
+          }
+        )
+        
+        this.loggedSessions[currentSession.user_id] = updatedSession;
+        await this.api.sendUpdateCacheSession(updatedSession.user_id, true); 
+      }
     }
   }
 
