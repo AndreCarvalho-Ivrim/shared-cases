@@ -2,7 +2,7 @@ import { ISessionRepository, ISessionSingletonRepository } from "../types/sessio
 import { Session } from "../entities/Session";
 import { PreDefinedApiFeedbacks } from "../types/session.type";
 import { convertDate, differenceMinutes } from "../utils/date";
-import { IAuthenticatedCommunication } from "../../services/isac/IAuthenticatedCommunication";
+import { ISingletonSessionRepositoryApiHubAndIsac } from "../types";
 
 export interface ShortSession{
   user_id: string,
@@ -23,7 +23,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   private constructor(
     private application: string,
     private sessionRepo: ISessionRepository,
-    private api: IAuthenticatedCommunication
+    private api: ISingletonSessionRepositoryApiHubAndIsac
   ) {
     this.loggedSessions = { };
     this.requestsToDeleteCacheInProgress = []
@@ -32,7 +32,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   public static getInstance(
     application: string,
     sessionRepo: ISessionRepository,
-    api: IAuthenticatedCommunication
+    api: ISingletonSessionRepositoryApiHubAndIsac
   ): SingletonSessionRepository {
     if (!SingletonSessionRepository.instance) {
       SingletonSessionRepository.instance = new SingletonSessionRepository(application, sessionRepo, api);

@@ -37,12 +37,17 @@ export interface SimpleNotificationPreferenceRepository{
 export interface ResponseGetTenantIdAndOwnerIdByFlowId extends ResultAndResponse{
   data?: { tenant_id: string, owner_id: string }
 }
-export interface SimpleAuthenticatedCommunication{
+export interface ISingletonSessionRepositoryApiHubAndIsac{
+  sendUpdateCacheSession(userId: string, session_id: string): Promise<ResultAndResponse>;
+}
+export interface SimpleAuthenticatedCommunication extends ISingletonSessionRepositoryApiHubAndIsac{
   sendNotifications(notification_ids: string[]): Promise<void>;
   getUsersWithFlowPermission(flow_id: string, flow_perms: string[]): Promise<ResponseUsers>;
   getFlowAuthsWithPreference(flow_id: string, user_ids?: string[], all?: boolean): Promise<ResponseUsers>;
   getTenantIdAndOwnerIdByFlowId(flow_id: string) : Promise<ResponseGetTenantIdAndOwnerIdByFlowId>;
-  sendUpdateCacheSession(userId: string, session_id: string): Promise<ResultAndResponse>;
+}
+export interface IHubCommunicationProvider extends ISingletonSessionRepositoryApiHubAndIsac{
+  createNotification(type: string, data: any): Promise<void>;
 }
 export interface SimpleNotificationCacheMemoryRepository{
   clearCache(user_id: string, client_id: string, flow_id?: string) : void
