@@ -42,17 +42,9 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
 
   public async checkActiveSession(currentSession: ShortSession): Promise<Session> {    
     let startedSession: Session | undefined = this.loggedSessions[currentSession.user_id]
-    const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
-
-    if (
-      startedSession &&
-      existsSession &&
-      startedSession.updated_at !== existsSession.updated_at
-    ) {
-      this.loggedSessions[currentSession.user_id] = existsSession;
-      startedSession = existsSession;
-    }
+    
     if (!startedSession) {
+      const existsSession = await this.sessionRepo.findLastActiveSessionOfUserId(currentSession.user_id);
       if(!existsSession) return;
 
       this.loggedSessions[currentSession.user_id] = existsSession;
@@ -91,19 +83,18 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
   ){
     const difference = differenceMinutes(this.application, currentSession.last_access);
     if(difference >= this.sessionExpireMinutesByLastAccess) {
-      if(this.loggedSessions[currentSession.user_id].updated_at !== this.now) {
-        const updatedSession = await this.sessionRepo.update(
-          currentSession.id, 
-          { 
-            last_access: this.now,
-            updated_at: this.now,
-            device: currentSession.device 
-          }
-        )
-        
-        this.loggedSessions[currentSession.user_id] = updatedSession;
-        await this.api.sendUpdateCacheSession(updatedSession.user_id, true); 
-      }
+      const date = new Date();
+      const updatedSession = await this.sessionRepo.update(
+        currentSession.id, 
+        { 
+          last_access: date,
+          updated_at: date,
+          device: currentSession.device 
+        }
+      )
+      
+      this.loggedSessions[currentSession.user_id] = updatedSession;
+      await this.api.sendUpdateCacheSession(updatedSession.user_id, true); 
     }
   }
 
