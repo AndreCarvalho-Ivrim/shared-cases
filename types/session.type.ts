@@ -4,9 +4,14 @@ import { ShortSession } from "../singleton/session";
 
 export type PreDefinedApiFeedbacks = 'Invalid JWT token' | 'There is already another session'
 
+export type Metadata = {
+  page: number,
+  limit: number,
+}
+
 export interface ISessionRepository {
   create(data: Omit<Session, "id" | "updated_at">): Promise<Session>,
-  findAllSessionByUserId(user_id: string): Promise<Record<string, number | Session[]>>,
+  findAllSessionByUserId(user_id: string, metadata?: Metadata): Promise<Record<string, number | Session[]>>,
   findById(id: string): Promise<Session>,
   findByUserId(user_id: string): Promise<Session>,
   findLastActiveSessionOfUserId(user_id: string): Promise<Session>,
