@@ -6,7 +6,7 @@ export type PreDefinedApiFeedbacks = 'Invalid JWT token' | 'There is already ano
 
 export interface ISessionRepository {
   create(data: Omit<Session, "id" | "updated_at">): Promise<Session>,
-  findAllSessionByUserId(user_id: string): Promise<Array<Session>>,
+  findAllSessionByUserId(user_id: string): Promise<Record<string, number | Session[]>>,
   findById(id: string): Promise<Session>,
   findByUserId(user_id: string): Promise<Session>,
   findLastActiveSessionOfUserId(user_id: string): Promise<Session>,
