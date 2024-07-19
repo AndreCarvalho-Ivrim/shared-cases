@@ -1,4 +1,3 @@
-import { AxiosResponse } from "axios";
 import { Session, SessionType } from "../entities/Session";
 import { ShortSession } from "../singleton/session";
 
