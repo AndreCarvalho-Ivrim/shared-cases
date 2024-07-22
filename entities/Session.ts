@@ -38,6 +38,8 @@ export class Session {
     };
 
     if(typeof this.active !== 'boolean') this.active = ['1',1,'true'].includes(this.active) ? true : false
+    if(!this.created_at) this.created_at = new Date();
+    if(!this.updated_at) this.updated_at = new Date();
 
     this.ip = Session.parseIp(this.ip)
   }
