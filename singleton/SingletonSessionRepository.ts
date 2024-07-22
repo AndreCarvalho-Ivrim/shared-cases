@@ -52,10 +52,7 @@ export class SingletonSessionRepository implements ISessionSingletonRepository {
     }
     
     let changedState = ['device'].some((key) => startedSession[key] !== currentSession[key]);
-    if(changedState || (
-      startedSession.ip !== currentSession.ip &&
-      !['15.228.146.170','172.27.0.4'].includes(currentSession.ip)
-    )){
+    if(changedState || startedSession.ip !== currentSession.ip){
       const expiredSession = differenceMinutes(this.application, startedSession.last_access) <= (Number(this.sessionExpireMinutes) * 3);
       if(expiredSession) throw new Error("There is already another session" as PreDefinedApiFeedbacks);
       else {

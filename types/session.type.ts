@@ -1,5 +1,5 @@
 import { Session, SessionType } from "../entities/Session";
-import { ShortSession } from "../singleton/session";
+import { ShortSession } from "../singleton/SingletonSessionRepository";
 
 export type PreDefinedApiFeedbacks = 'Invalid JWT token' | 'There is already another session'
 
