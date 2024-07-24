@@ -1,3 +1,4 @@
+import { Client } from "../entities/Client";
 import { User } from "../entities/User"
 import { UserCategory } from "../entities/UserCategory"
 
@@ -5,7 +6,7 @@ interface UserWithUserCategoryType extends User {
   userCategory?: UserCategory
 }
 
-export interface ClientType {
+export interface ShortClientType {
   id: string;
   cnpj: string;
   razao_social: string;
@@ -25,5 +26,6 @@ export interface ClientType {
 } 
 
 export interface IShortClientRepository {
-  findById(id: string): Promise<ClientType>;
+  findById(id: string): Promise<ShortClientType>;
+  findClients(client_ids: string[]): Promise<Client[]>;
 }
