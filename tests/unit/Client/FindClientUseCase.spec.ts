@@ -13,7 +13,7 @@ describe("FindClientUseCase", () => {
     try {
       if (process.env.TEST_ENV === "hub") {
         // @ts-ignore
-        const { ClientRepository } = await import("../../../repositories/in-SQLite/ClientRepository"); 
+        const { ClientRepository } = await import("../../../../repositories/in-SQLite/ClientRepository"); 
         repository = new ClientRepository();
       }
       else {
