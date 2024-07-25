@@ -1,9 +1,28 @@
 import { Client } from "../entities/Client";
-import { User } from "../entities/User"
-import { UserCategory } from "../entities/UserCategory"
+import { User } from "../entities/User";
 
-interface UserWithUserCategoryType extends User {
-  userCategory?: UserCategory
+export interface Deadline {
+  id: string,
+  clientId: string,
+  stageSlug: string,
+  days: number,
+  active: boolean,
+}
+
+export interface UserCategoryType {
+  id: string,
+  slug?: string,
+  name: string,
+  description: string,
+  depth: string,
+  clientId?: string,
+  userCategory?: any,
+}
+
+export type UserShortClient = Omit<User, 'userCategories'>
+export interface UserWithUserCategoryType extends UserShortClient {
+  userCategories?: Omit<UserCategoryType, 'id' | 'name' | 'description' | 'depth'>[]
+  userCategory?: Omit<UserCategoryType, 'id' | 'name' | 'description' | 'depth'>[]
 }
 
 export interface ShortClientType {
@@ -23,6 +42,7 @@ export interface ShortClientType {
   picture?: string;
   economic_group?: string;
   users?: UserWithUserCategoryType[];
+  deadlines?: Pick<Deadline, 'stageSlug' | 'days'>[]
 } 
 
 export interface IShortClientRepository {
