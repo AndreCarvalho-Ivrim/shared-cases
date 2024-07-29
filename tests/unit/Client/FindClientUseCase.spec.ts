@@ -49,7 +49,7 @@ describe("FindClientUseCase", () => {
     try {
       await useCase.execute("123abc");
     } catch(error) {
-      expect(error.message).toMatch("Client does not exist");
+      expect(error.message).toMatch("Cliente não encontrado");
     }
   })
 })

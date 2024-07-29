@@ -8,14 +8,6 @@ export class FindClientUseCase {
 
     if (!alreadyExists) throw new Error("Cliente não encontrado");
 
-    alreadyExists.users = alreadyExists.users.map((user) => {
-      user.userCategory = (user as any).userCategories.find(
-        (category) => category.userCategory.clientId === alreadyExists.id
-      )?.userCategory;
-      delete user.userCategories;
-      return user;
-    });
-
     return alreadyExists;
   }
 }

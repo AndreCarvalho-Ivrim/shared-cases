@@ -21,8 +21,7 @@ export interface UserCategoryType {
 
 export type UserShortClient = Omit<User, 'userCategories'>
 export interface UserWithUserCategoryType extends UserShortClient {
-  userCategories?: Omit<UserCategoryType, 'id' | 'name' | 'description' | 'depth'>[]
-  userCategory?: Omit<UserCategoryType, 'id' | 'name' | 'description' | 'depth'>[]
+  userCategory?: UserCategoryType
 }
 
 export interface ShortClientType {
@@ -42,7 +41,6 @@ export interface ShortClientType {
   picture?: string;
   economic_group?: string;
   users?: UserWithUserCategoryType[];
-  deadlines?: Pick<Deadline, 'stageSlug' | 'days'>[]
 } 
 
 export interface IShortClientRepository {
