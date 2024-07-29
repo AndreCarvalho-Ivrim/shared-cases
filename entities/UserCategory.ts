@@ -14,7 +14,7 @@ export class UserCategory{
     Object.assign(this,props);
     
     if(this.depth == undefined) this.depth = 0;
-    
+    if(!this.permitions) this.permitions = [];
     if(id) this.id = id
   }
 }

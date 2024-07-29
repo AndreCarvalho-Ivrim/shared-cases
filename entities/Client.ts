@@ -1,6 +1,7 @@
 import { v4 as uuid_v4 } from "uuid";
+import { User } from "./User";
 
-export const clientFields : Record<keyof Omit<Client, 'id' | 'deadlines'>, true> = {
+export const clientFields : Record<keyof Omit<Client, 'id' | 'deadlines' | 'users'>, true> = {
   cnpj: true,
   razao_social: true,
   nome_fantasia: true,
@@ -37,8 +38,11 @@ export class Client {
   public telefone: string
   public email: string
 
+  public users? : User[]
+
   constructor(props: Omit<Client, 'id'>, id?: string) {
     Object.assign(this, props);
     if(id) this.id = id
+    if(!this.users) this.users = [];
   }
 }

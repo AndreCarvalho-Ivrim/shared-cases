@@ -15,6 +15,7 @@ export class User {
   public location?: string;
   public costCenterId?: string;
   public userCategories?: UserCategory[];
+  public userCategory?: UserCategory;
 
   constructor(props: Omit<User, 'id'>, id?: string){
     Object.assign(this, props);
