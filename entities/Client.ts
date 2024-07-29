@@ -1,6 +1,5 @@
 import { v4 as uuid_v4 } from "uuid";
 import { User } from "./User";
-import { ShortUser } from "../../shared-types";
 
 export const clientFields : Record<keyof Omit<Client, 'id' | 'deadlines' | 'users'>, true> = {
   cnpj: true,
@@ -39,7 +38,7 @@ export class Client {
   public telefone: string
   public email: string
 
-  public users? : (User | ShortUser)[]
+  public users? : User[]
 
   constructor(props: Omit<Client, 'id'>, id?: string) {
     Object.assign(this, props);
