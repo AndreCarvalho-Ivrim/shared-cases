@@ -11,11 +11,11 @@ export interface Deadline {
 
 export interface UserCategoryType {
   id: string,
-  slug?: string,
+  slug: string,
   name: string,
   description: string,
-  depth: string,
-  clientId?: string,
+  depth: number,
+  clientId: string,
   userCategory?: any,
 }
 
