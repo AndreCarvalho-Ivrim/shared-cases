@@ -27,6 +27,7 @@ export class Session {
   public country?: string;
   public created_at: Date;
   public updated_at?: Date;
+  public static sessionLocation: Record<string, SessionLocationType> = {};
 
   constructor(props: Omit<Session, "id">, id?: string) {
     Object.assign(this, props);
@@ -62,25 +63,33 @@ export class Session {
   }
 
   static async getLocation(ip: string): Promise<SessionLocationType> {
-    let location = {
-      city: undefined,
-      state: undefined,
-      country: undefined,
+    if (
+      !this.sessionLocation[ip] 
+      || (this.sessionLocation[ip] && !this.sessionLocation[ip].country)
+    ) {
+      let location = {
+        city: undefined,
+        state: undefined,
+        country: undefined,
+      }
+  
+      try {
+        const { data } = await axios.get(`http://ip-api.com/json/${ip}`, {
+          timeout: 1000
+        });
+        if(data.message !== 'reserved range') location = {
+          city: data.city,
+          state: data.region,
+          country: data.country === 'Brazil' ? 'Brasil' : data.country, 
+        };
+        
+        this.sessionLocation[ip] = location;
+        return location;
+      } catch (error) {
+        return location;
+      }
     }
-
-    try {
-      const { data } = await axios.get(`http://ip-api.com/json/${ip}`, {
-        timeout: 1000
-      });
-      if(data.message !== 'reserved range') location = {
-        city: data.city,
-        state: data.region,
-        country: data.country === 'Brazil' ? 'Brasil' : data.country, 
-      };
-
-      return location;
-    } catch (error) {
-      return location;
-    }
+    
+    return this.sessionLocation[ip];
   }
 }
