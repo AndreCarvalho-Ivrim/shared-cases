@@ -69,7 +69,9 @@ export class Session {
     }
 
     try {
-      const { data } = await axios.get(`http://ip-api.com/json/${ip}`);
+      const { data } = await axios.get(`http://ip-api.com/json/${ip}`, {
+        timeout: 1000
+      });
       if(data.message !== 'reserved range') location = {
         city: data.city,
         state: data.region,
