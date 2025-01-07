@@ -40,6 +40,7 @@ export interface ShortClientType {
   email: string;
   picture?: string;
   economic_group?: string;
+  dedicated_server?: string;
   users?: UserWithUserCategoryType[];
 } 
 
