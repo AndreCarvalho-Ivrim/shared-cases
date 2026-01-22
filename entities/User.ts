@@ -16,6 +16,7 @@ export class User {
   public costCenterId?: string;
   public userCategories?: UserCategory[];
   public userCategory?: UserCategory;
+  public first_access: boolean;
 
   constructor(props: Omit<User, 'id'>, id?: string){
     Object.assign(this, props);
